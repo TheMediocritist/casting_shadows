@@ -1,0 +1,9 @@
+name=Template
+author=You, Inc.
+description=A basic game template.
+bundleID=com.yourcompany.TemplateGame
+version=1.0
+buildNumber=100
+imagePath=SystemAssets
+pdxversion=11200
+buildtime=710566781
