@@ -9,14 +9,14 @@ playdate.display.setRefreshRate(50)
 gfx.setColor(gfx.kColorBlack)
 
 local obstacles = {}
-obstacles[#obstacles + 1] = {type = 'rect', height = 20, geom = geom.polygon.new(0, 60, 120, 60, 120, 80, 0, 80, 0, 60)}
-obstacles[#obstacles + 1] = {type = 'rect', height = 20, geom = geom.polygon.new(100, 100, 120, 100, 120, 120, 100, 120, 100, 100)}
-obstacles[#obstacles + 1] = {type = 'rect', height = 20, geom = geom.polygon.new(200, 40, 220, 40, 220, 80, 200, 80, 200, 40)}
-obstacles[#obstacles + 1] = {type = 'rect', height = 20, geom = geom.polygon.new(100, 200, 120, 200, 120, 220, 100, 220, 100, 200)}
-obstacles[#obstacles + 1] = {type = 'rect', height = 20, geom = geom.polygon.new(200, 200, 220, 200, 220, 220, 200, 220, 200, 200)}
-obstacles[#obstacles + 1] = {type = 'rect', height = 20, geom = geom.polygon.new(160, 140, 180, 140, 180, 1800, 160, 180, 160, 140)}
-obstacles[#obstacles + 1] = {type = 'rect', height = 20, geom = geom.polygon.new(200, 200, 220, 200, 220, 220, 200, 220, 200, 200)}
-obstacles[#obstacles + 1] = {type = 'circle', height = 20, x = 180, y = 100, diameter = 10}
+obstacles[#obstacles + 1] = {type = 'rect', height = 8, geom = geom.polygon.new(0, 60, 120, 60, 120, 80, 0, 80, 0, 60)}
+obstacles[#obstacles + 1] = {type = 'rect', height = 3, geom = geom.polygon.new(100, 100, 120, 100, 120, 120, 100, 120, 100, 100)}
+obstacles[#obstacles + 1] = {type = 'rect', height = 25, geom = geom.polygon.new(200, 40, 220, 40, 220, 80, 200, 80, 200, 40)}
+obstacles[#obstacles + 1] = {type = 'rect', height = 10, geom = geom.polygon.new(100, 200, 120, 200, 120, 220, 100, 220, 100, 200)}
+obstacles[#obstacles + 1] = {type = 'rect', height = 15, geom = geom.polygon.new(200, 200, 220, 200, 220, 220, 200, 220, 200, 200)}
+obstacles[#obstacles + 1] = {type = 'rect', height = 5, geom = geom.polygon.new(160, 140, 180, 140, 180, 1800, 160, 180, 160, 140)}
+obstacles[#obstacles + 1] = {type = 'rect', height = 9, geom = geom.polygon.new(200, 200, 220, 200, 220, 220, 200, 220, 200, 200)}
+obstacles[#obstacles + 1] = {type = 'circle', height = 13, x = 180, y = 100, diameter = 10}
 
 local player = {}
 player.x, player.y = 200, 120
@@ -72,12 +72,7 @@ function playdate.update()
                     gfx.drawPolygon(shadow_poly)
                 end
                 
-                -- draw obstacle
-                if shadows == true then
-                    gfx.fillPolygon(obstacle.geom)
-                else
-                    gfx.drawPolygon(obstacle.geom)
-                end
+                
             end
         elseif obstacle.type == 'circle' then
             local obstacle_dir = math.deg(math.atan2(obstacle.y - player.y, obstacle.x - player.x))
@@ -97,13 +92,45 @@ function playdate.update()
                 gfx.drawPolygon(shadow_poly)
             end
             
+        end
+    end
+    
+    for _, obstacle in pairs(obstacles) do
+    
+        if obstacle.type == 'rect' then
             -- draw obstacle
             if shadows == true then
+                gfx.setPattern({0x0, 0x44, 0x0, 0x11, 0x0, 0x44, 0x0, 0x11})
+                gfx.fillPolygon(obstacle.geom)
+                local top = obstacle.geom:copy()
+                top:translate(0, -obstacle.height)
+                gfx.setPattern({0x55, 0xFF, 0x55, 0xFF, 0x55, 0xFF, 0x55, 0xFF})
+                gfx.fillPolygon(top)
+                gfx.setColor(gfx.kColorBlack)
+                gfx.drawPolygon(top)
+                
+            else
+                gfx.drawPolygon(obstacle.geom)
+            end
+        
+        elseif obstacle.type == 'circle' then
+            -- draw obstacle
+            if shadows == true then
+                gfx.setPattern({0x0, 0x44, 0x0, 0x11, 0x0, 0x44, 0x0, 0x11})
+                gfx.fillRect(obstacle.x - obstacle.diameter, obstacle.y - obstacle.height, obstacle.diameter * 2, obstacle.height)
                 gfx.fillCircleAtPoint(obstacle.x, obstacle.y, obstacle.diameter)
+                gfx.setPattern({0x55, 0xFF, 0x55, 0xFF, 0x55, 0xFF, 0x55, 0xFF})
+                gfx.fillCircleAtPoint(obstacle.x, obstacle.y-obstacle.height, obstacle.diameter)
+                gfx.setColor(gfx.kColorBlack)
+                gfx.drawCircleAtPoint(obstacle.x, obstacle.y-obstacle.height, obstacle.diameter)
             else
                 gfx.drawCircleAtPoint(obstacle.x, obstacle.y, obstacle.diameter)
             end
         end
+        
+        -- draw big mask
+        gfx.fillEllipseInRect(player.x - 400, player.y - 400, 800, 800, player.direction + player.torch_width/2, player.direction - player.torch_width/2)
+        
     end
     
     -- draw player
